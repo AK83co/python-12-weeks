@@ -23,6 +23,7 @@ click the **Source Control** icon on the left (it looks like a branching line), 
 
 ## Tips
 
+- You can add your own code under an exercise's function to try it out, even code with `input()`. Run the file with `python weeks/week01_hello_python/ex5_initials.py` to play with it. The checker answers `input()` with "1" and hides your extra prints, so it won't break the tests.
 - The **Testing** panel (flask icon on the left) shows every test with a green tick or red cross. Click ▶ to run them.
 - Codespaces stop after 30 minutes of inactivity. Your files are kept; reopen it from github.com/codespaces.
 - Free GitHub accounts get a monthly allowance of free Codespace hours. Stop the Codespace when you finish a session to make it last.

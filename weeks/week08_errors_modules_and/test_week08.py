@@ -2,11 +2,51 @@
 # Run them with:  python check.py 8
 # You don't need to edit this file.
 
+import builtins
+import contextlib
+import io
 import subprocess
 import sys
+import warnings
 from pathlib import Path
 
 HERE = Path(__file__).parent
+
+
+class _StopExtraCode(Exception):
+    pass
+
+
+def load(filename):
+    """Run an exercise file and give the tests its functions and classes.
+
+    You can add your own code below your function, even code that uses
+    input() or print(). While testing, input() gets the answer "1" and
+    anything printed is hidden, so your extra code can't break the tests.
+    """
+    namespace = {"__name__": "exercise"}  # so if __name__ == "__main__": blocks are skipped
+    code = compile((HERE / filename).read_text(encoding="utf-8"), str(HERE / filename), "exec")
+    calls = 0
+
+    def fake_input(prompt=""):
+        nonlocal calls
+        calls += 1
+        if calls > 100:
+            raise _StopExtraCode()  # a loop that keeps asking forever
+        return "1"
+
+    real_input = builtins.input
+    builtins.input = fake_input
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            exec(code, namespace)
+    except _StopExtraCode:
+        pass
+    except Exception as error:
+        warnings.warn(f"{filename}: your extra code crashed while testing ({type(error).__name__}: {error}). The tests still checked everything defined above that line.")
+    finally:
+        builtins.input = real_input
+    globals().update({k: v for k, v in namespace.items() if not k.startswith("__")})
 
 
 def __raises(f, exc):
@@ -20,13 +60,13 @@ def __raises(f, exc):
 
 
 def run_output(filename):
-    result = subprocess.run([sys.executable, str(HERE / filename)], capture_output=True, text=True, input="", timeout=10)
+    result = subprocess.run([sys.executable, str(HERE / filename)], capture_output=True, text=True, input="1\n" * 20, timeout=10)
     assert result.returncode == 0, result.stderr
     return "\n".join(line.rstrip() for line in result.stdout.strip().splitlines())
 
 
 # ---- Exercise 1: Safe division ----
-from ex1_safe_division import *  # noqa
+load("ex1_safe_division.py")
 
 
 def test_safe_division_1():
@@ -42,7 +82,7 @@ def test_safe_division_3():
 
 
 # ---- Exercise 2: Forgiving number reader ----
-from ex2_forgiving_number_reader import *  # noqa
+load("ex2_forgiving_number_reader.py")
 
 
 def test_forgiving_number_reader_1():
@@ -66,7 +106,7 @@ def test_forgiving_number_reader_5():
 
 
 # ---- Exercise 3: Validate an age ----
-from ex3_validate_an_age import *  # noqa
+load("ex3_validate_an_age.py")
 
 
 def test_validate_an_age_1():
@@ -86,7 +126,7 @@ def test_validate_an_age_4():
 
 
 # ---- Exercise 4: Hypotenuse ----
-from ex4_hypotenuse import *  # noqa
+load("ex4_hypotenuse.py")
 
 
 def test_hypotenuse_1():
