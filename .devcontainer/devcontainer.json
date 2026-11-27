@@ -1,0 +1,25 @@
+{
+  "name": "Python in 12 Weeks",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "postCreateCommand": "pip install --user -r requirements.txt",
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "START_HERE.md"
+      ]
+    },
+    "vscode": {
+      "extensions": [
+        "ms-python.python"
+      ],
+      "settings": {
+        "python.testing.pytestEnabled": true,
+        "python.testing.pytestArgs": [
+          "weeks"
+        ],
+        "editor.tabSize": 4,
+        "files.autoSave": "afterDelay"
+      }
+    }
+  }
+}
